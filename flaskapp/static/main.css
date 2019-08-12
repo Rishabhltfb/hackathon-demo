@@ -1,0 +1,47 @@
+body{
+    padding: 0;
+    margin: 0;
+}
+.font-Lexend{
+    font-family: 'Lexend Exa', sans-serif;
+}
+.register-login{
+    height: 100vh;
+    margin: 0;
+}
+
+.register-login-col-r{
+    background-color: #1e272e;
+    height: 100vh;
+    color: white;
+}
+
+.register-login-col-l{
+    background-color: #05c46b;
+    height: 100vh;
+}
+
+.register-img{
+    height:60%;
+    width: 100%;
+}
+
+.field-size{
+    width:60%;
+}
+
+.donate-col{
+    background-color: #05c46b;
+    height: 100vh;
+    text-align: center;
+}
+.ngo-col{
+    background-color: #1e272e;
+    height: 100vh;
+    text-align: center;
+}
+.delivery-col{
+    background-color: #05c46b;
+    height: 100vh;
+    text-align: center;
+}
