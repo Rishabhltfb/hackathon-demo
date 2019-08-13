@@ -74,6 +74,11 @@ def save_picture(form_picture):
 
     return picture_fn
 
+@app.route("/donate")
+@login_required
+def donate():
+    return render_template('donate.html')
+
 
 @app.route("/account", methods=['GET', 'POST'])
 @login_required

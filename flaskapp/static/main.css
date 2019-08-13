@@ -1,6 +1,8 @@
 body{
     padding: 0;
     margin: 0;
+    overflow-x: hidden;
+    background-color: #1e272e;
 }
 .font-Lexend{
     font-family: 'Lexend Exa', sans-serif;
@@ -44,4 +46,16 @@ body{
     background-color: #05c46b;
     height: 100vh;
     text-align: center;
+}
+#donate-pic{
+    height: 400px;
+    width: 250px;
+}
+#ngo-pic{
+    height: 400px;
+    width: 250px;
+}
+#deliver-pic{
+    height: 400px;
+    width: 250px;
 }
