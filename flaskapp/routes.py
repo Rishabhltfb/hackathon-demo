@@ -3,8 +3,8 @@ import secrets
 from PIL import Image
 from flask import render_template, url_for, flash, redirect, request, abort
 from flaskapp import app, db, bcrypt
-from flaskapp.forms import RegistrationForm, LoginForm, UpdateAccountForm
-from flaskapp.models import User
+from flaskapp.forms import RegistrationForm, LoginForm, UpdateAccountForm, DetailForm
+from flaskapp.models import User, Detail
 from flask_login import login_user, current_user, logout_user, login_required
 
 
@@ -27,7 +27,10 @@ def choice():
 @app.route("/register", methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
-        return redirect(url_for('choice'))
+        if current_user.is_registered == 'False':
+            return redirect(url_for('detail'))
+        elif current_user.is_registered == 'True':
+            return redirect(url_for('choice'))
     form = RegistrationForm()
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
@@ -42,14 +45,19 @@ def register():
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('choice'))
+        if current_user.is_registered == 'False':
+            return redirect(url_for('detail'))
+        elif current_user.is_registered == 'True':
+            return redirect(url_for('choice'))
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
-        if user and bcrypt.check_password_hash(user.password, form.password.data):
+        if user and bcrypt.check_password_hash(user.password, form.password.data) and user.is_registered == 'True':
             login_user(user, remember=form.remember.data)
-            next_page = request.args.get('next')
-            return redirect(next_page) if next_page else redirect(url_for('choice'))
+            return redirect('choice')
+        elif user and bcrypt.check_password_hash(user.password, form.password.data) and user.is_registered == 'False':
+            login_user(user, remember=form.remember.data)
+            return redirect('detail')
         else:
             flash('Login Unsuccessful. Please check email and password', 'danger')
     return render_template('login.html', title='Login', form=form)
@@ -74,15 +82,25 @@ def save_picture(form_picture):
 
     return picture_fn
 
-@app.route("/donate")
+@app.route("/detail", methods=['GET', 'POST'])
 @login_required
-def donate():
-    return render_template('donate.html')
+def detail():
+    form = DetailForm()
+    if form.validate_on_submit():
+        detail = Detail(name=form.name.data, address=form.address.data, gender=form.gender.data,phone_no=form.phone_no.data)
+        user= User.query.filter_by(username=current_user.username).first()
+        user.is_registered = 'True'
+        db.session.add(detail)
+        db.session.add(user)
+        db.session.commit()
+        flash('Details received!', 'success')
+        return redirect(url_for('choice'))
+    return render_template('detail.html', form=form)
 
 
-@app.route("/account", methods=['GET', 'POST'])
+@app.route("/account/<string:choice>", methods=['GET', 'POST'])
 @login_required
-def account():
+def account(choice):
     form = UpdateAccountForm()
     page = request.args.get('page', 1, type=int)
     user = User.query.filter_by(username=current_user.username).first_or_404()
@@ -99,7 +117,16 @@ def account():
         form.username.data = current_user.username
         form.email.data = current_user.email
     image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
-    return render_template('account.html', title='Account',
+
+    if choice == "donate":
+        return render_template('donate.html', title='Account',
                            image_file=image_file, form=form, user=user)
+    elif choice == "ngo":
+        return render_template('ngo.html', title='Account',
+                           image_file=image_file, form=form, user=user)
+    elif choice == "deliver":
+        return render_template('deliver.html', title='Account',
+                           image_file=image_file, form=form, user=user)         
+    
 
 

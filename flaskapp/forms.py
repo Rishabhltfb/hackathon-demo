@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from flask_login import current_user
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, SelectField, IntegerField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from flaskapp.models import User
 
@@ -55,3 +55,15 @@ class UpdateAccountForm(FlaskForm):
             if user:
                 raise ValidationError('That email is taken. Please choose a different one.')
 
+
+
+
+class DetailForm(FlaskForm):
+    name = StringField('Name',
+                            validators=[DataRequired(), Length(min=2, max=25)])
+    address = StringField('Address',
+                        validators=[DataRequired(), Length(min=2,max=100)])
+    gender = SelectField('Gender', choices=[('M','Male'),('F','Female')],
+                        validators=[DataRequired()])                    
+    phone_no = IntegerField('Mobile Number',validators=[DataRequired()])                    
+    submit = SubmitField('Done')
